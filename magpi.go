@@ -8,9 +8,32 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
+
+const DOWNLOADPATH = "/Users/ras/Documents/Magazines/MagPi/"
+
+func isDownloaded(dir, pdf string) (bool, string) {
+	var files []string
+	filepath.Walk(dir, func(p string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			files = append(files, p)
+		}
+		return nil
+	})
+	for _, f := range files {
+		if path.Base(f) == pdf {
+			return true, f
+		}
+	}
+	return false, ""
+}
 
 func checkErr(e error) {
 	if e != nil {
@@ -93,9 +116,15 @@ func main() {
 			fmt.Println("Could not find download link to MagPi issue nr:", nr)
 			continue
 		}
+		check, localPath := isDownloaded(DOWNLOADPATH, fileName)
+		if check {
+			fmt.Printf("MagPi issue nr: %s is already downloaded -> %s\n", nr, localPath)
+			continue
+		}
+
 		fmt.Println("Downloading MagPi issue nr:", nr)
 
-		file, err := os.Create(fileName)
+		file, err := os.Create(path.Join(DOWNLOADPATH, fileName))
 		checkErr(err)
 
 		client := http.Client{
@@ -114,5 +143,5 @@ func main() {
 		defer file.Close()
 		fmt.Printf("Downloaded: %s\n", fileName)
 	}
-	fmt.Println("Finished downloading.")
+	fmt.Println("Finished.")
 }
