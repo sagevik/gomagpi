@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-const DOWNLOADPATH = "/Users/ras/Documents/Magazines/MagPi/"
+const DOWNLOADPATH = "Documents/Magazines/MagPi/"
 
 func isDownloaded(dir, pdf string) (bool, string) {
 	var files []string
@@ -42,6 +42,14 @@ func checkErr(e error) {
 	}
 }
 
+func createDirectoryIfNotExists(p string) {
+	err := os.MkdirAll(p, os.ModePerm)
+	if err != nil {
+		fmt.Println("Could not create download directory")
+		os.Exit(1)
+	}
+}
+
 func createDownloadLink(pre, s string) string {
 	var pdfPart string
 	linkParts := strings.Split(s, "href=\"")
@@ -62,6 +70,15 @@ func checkArgs(s1, s2 string) (int, int) {
 		return i2, i1
 	}
 	return i1, i2
+}
+
+func downloadPath() string {
+	dirname, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println("Could not get user home dir")
+		os.Exit(1)
+	}
+	return dirname
 }
 
 func parseArgs(a []string) []string {
@@ -116,7 +133,12 @@ func main() {
 			fmt.Println("Could not find download link to MagPi issue nr:", nr)
 			continue
 		}
-		check, localPath := isDownloaded(DOWNLOADPATH, fileName)
+
+		dlPath := path.Join(downloadPath(), DOWNLOADPATH)
+
+		createDirectoryIfNotExists(dlPath)
+
+		check, localPath := isDownloaded(dlPath, fileName)
 		if check {
 			fmt.Printf("MagPi issue nr: %s is already downloaded -> %s\n", nr, localPath)
 			continue
@@ -124,7 +146,7 @@ func main() {
 
 		fmt.Println("Downloading MagPi issue nr:", nr)
 
-		file, err := os.Create(path.Join(DOWNLOADPATH, fileName))
+		file, err := os.Create(path.Join(dlPath, fileName))
 		checkErr(err)
 
 		client := http.Client{
