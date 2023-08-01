@@ -41,12 +41,23 @@ func checkErr(e error) {
 		os.Exit(1)
 	}
 }
-
-func createDirectoryIfNotExists(p string) {
-	err := os.MkdirAll(p, os.ModePerm)
+func directoryExists(path string) bool {
+	info, err := os.Stat(path)
 	if err != nil {
-		fmt.Println("Could not create download directory")
-		os.Exit(1)
+		if os.IsNotExist(err) {
+			return false
+		}
+	}
+	return info.IsDir()
+}
+
+func createDirectoryIfNotExists(path string) {
+	if !directoryExists(path) {
+		err := os.MkdirAll(path, 0755)
+		if err != nil {
+			fmt.Println("Could not create download directory")
+			os.Exit(1)
+		}
 	}
 }
 
