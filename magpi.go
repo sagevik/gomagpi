@@ -16,7 +16,7 @@ import (
 
 const DOWNLOADPATH = "Documents/Magazines/MagPi/"
 
-func isDownloaded(dir, pdf string) (bool, string) {
+func isDownloaded(dir, pdf string) string {
 	var files []string
 	filepath.Walk(dir, func(p string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -29,10 +29,10 @@ func isDownloaded(dir, pdf string) (bool, string) {
 	})
 	for _, f := range files {
 		if path.Base(f) == pdf {
-			return true, f
+			return f
 		}
 	}
-	return false, ""
+	return ""
 }
 
 func checkErr(e error) {
@@ -149,8 +149,8 @@ func main() {
 
 		createDirectoryIfNotExists(dlPath)
 
-		check, localPath := isDownloaded(dlPath, fileName)
-		if check {
+		localPath := isDownloaded(dlPath, fileName)
+		if localPath != "" {
 			fmt.Printf("MagPi issue nr: %s is already downloaded -> %s\n", nr, localPath)
 			continue
 		}
