@@ -83,7 +83,7 @@ func checkArgs(s1, s2 string) (int, int) {
 	return i1, i2
 }
 
-func downloadPath() string {
+func userHomeDir() string {
 	dirname, err := os.UserHomeDir()
 	if err != nil {
 		fmt.Println("Could not get user home dir")
@@ -145,7 +145,7 @@ func main() {
 			continue
 		}
 
-		dlPath := path.Join(downloadPath(), DOWNLOADPATH)
+		dlPath := path.Join(userHomeDir(), DOWNLOADPATH)
 
 		createDirectoryIfNotExists(dlPath)
 
