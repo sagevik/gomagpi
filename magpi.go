@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-const DOWNLOADPATH = "Documents/Magazines/MagPi/"
+const DOWNLOADPATH = "dox/magazines/magpi/"
 
 func isDownloaded(dir, pdf string) string {
 	var files []string
